@@ -342,10 +342,49 @@ def parse_right_branching(sent):
             new_part = [[j] for j in range(i - 1)] + [[i-1,i]]
 
         full_parse = [new_part] + full_parse
-
     return full_parse
 
 
+def parse_random(sent):
+    import random
+    length = len(sent.split())
+    full_parse = []
+    while length > 0:
+        if length == 1:
+            full_parse.append([[0]])
+        elif length == 2:
+            full_parse.append([[0, 1]])
+        else:
+            position = random.randint(0, length - 2)
+            current_parse = []
+            for i in range(length):
+                if i == position:
+                    current_parse.append([i, i+1])
+                elif i == position + 1:
+                    continue
+                else:
+                    current_parse.append([i])
+            full_parse.append(current_parse)
+        length -= 1
+    return full_parse
 
-
+def parse_balanced(sent):
+    length = len(sent.split())
+    full_parse = []
+    while length > 0:
+        if length == 1:
+            full_parse.append([[0]])
+            break
+        elif length == 2:
+            full_parse.append([[0, 1]])
+        else:
+            current_parse = []
+            for i in range(0, length, 2):
+                if i < length - 1:
+                    current_parse.append([i, i+1])
+                else:
+                    current_parse.append([i])
+            full_parse.append(current_parse)
+        length = (length + 1) // 2
+    return full_parse
 

@@ -53,8 +53,12 @@ args = parser.parse_args()
 
 
 prefix = args.task
-if args.parse_strategy == "right_branching":
+if args.parse_strategy == 'random':
+    directory = "models/" + args.task + "_" + args.encoder + "_" + args.decoder  + "_" + "RD" + "_" + args.attention + "_" + str(args.lr) + "_" + str(args.hs)
+elif args.parse_strategy == "right_branching":
     directory = "models/" + args.task + "_" + args.encoder + "_" + args.decoder  + "_" + "RB" + "_" + args.attention + "_" + str(args.lr) + "_" + str(args.hs)
+elif args.parse_strategy == 'balanced':
+    directory = "models/" + args.task + "_" + args.encoder + "_" + args.decoder  + "_" + "BL" + "_" + args.attention + "_" + str(args.lr) + "_" + str(args.hs)
 else:
     directory = "models/" + args.task + "_" + args.encoder + "_" + args.decoder  + "_" + args.attention + "_" + str(args.lr) + "_" + str(args.hs)
 
@@ -160,11 +164,19 @@ def file_to_batches(filename, MAX_LENGTH, batch_size=5):
                     pair = [words1, words2, parse_tense(s1), parse_tense(s2)]
                 elif args.parse_strategy == "right_branching":
                     pair = [words1, words2, parse_right_branching(s1), parse_right_branching(s2)]
+                elif args.parse_strategy == 'random':
+                    pair = [words1, words2, parse_random(s1), parse_random(s2)]
+                elif args.parse_strategy == 'balanced':
+                    pair = [words1, words2, parse_balanced(s1), parse_balanced(s2)]
             else:
                 if args.parse_strategy == "correct":
                     pair = [words1, words2, parse_question(s1), parse_question(s2)]
                 elif args.parse_strategy == "right_branching":
                     pair = [words1, words2, parse_right_branching(s1), parse_right_branching(s2)]
+                elif args.parse_strategy == 'random':
+                    pair = [words1, words2, parse_random(s1), parse_random(s2)]
+                elif args.parse_strategy == 'balanced':
+                    pair = [words1, words2, parse_balanced(s1), parse_balanced(s2)]
 
         pairs.append(pair)
 

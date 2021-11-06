@@ -56,6 +56,10 @@ args = parser.parse_args()
 prefix = args.task
 if args.parse_strategy == "right_branching": 
     directory = "models/" + args.task + "_" + args.encoder + "_" + args.decoder  + "_" + "RB" + "_" + args.attention + "_" + str(args.lr) + "_" + str(args.hs)
+elif args.parse_strategy == 'random':
+    directory = "models/" + args.task + "_" + args.encoder + "_" + args.decoder  + "_" + "RD" + "_" + args.attention + "_" + str(args.lr) + "_" + str(args.hs)
+elif args.parse_strategy == 'balanced':
+    directory = "models/" + args.task + "_" + args.encoder + "_" + args.decoder  + "_" + "BL" + "_" + args.attention + "_" + str(args.lr) + "_" + str(args.hs)
 else:
     directory = "models/" + args.task + "_" + args.encoder + "_" + args.decoder  + "_" + args.attention + "_" + str(args.lr) + "_" + str(args.hs)
 
