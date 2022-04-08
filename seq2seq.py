@@ -59,14 +59,16 @@ elif args.parse_strategy == "right_branching":
     directory = "models/" + args.task + "_" + args.encoder + "_" + args.decoder  + "_" + "RB" + "_" + args.attention + "_" + str(args.lr) + "_" + str(args.hs)
 elif args.parse_strategy == 'balanced':
     directory = "models/" + args.task + "_" + args.encoder + "_" + args.decoder  + "_" + "BL" + "_" + args.attention + "_" + str(args.lr) + "_" + str(args.hs)
+elif args.parse_strategy == 'balanced_aux':
+    directory = "models/" + args.task + "_" + args.encoder + "_" + args.decoder  + "_" + "AUX" + "_" + args.attention + "_" + str(args.lr) + "_" + str(args.hs)
 else:
     directory = "models/" + args.task + "_" + args.encoder + "_" + args.decoder  + "_" + args.attention + "_" + str(args.lr) + "_" + str(args.hs)
 
 
 # Create a directory where the outputs will be saved
 if __name__ == "__main__":
-    wait_time = random.randint(0, 99)
-    time.sleep(wait_time)
+    # wait_time = random.randint(0, 99)
+    # time.sleep(wait_time)
 
     counter = 0
     dir_made = 0
@@ -127,7 +129,7 @@ for line in fi:
     word2index[parts[0]] = int(parts[1])
     index2word[int(parts[1])] = parts[0]
 
-
+aux_id_set = {word2index[x] for x in ["don't", "do", "does", "doesn't", "did", "didn't"]}
 
 
 # Function for preprocessing files into batches
@@ -155,6 +157,11 @@ def file_to_batches(filename, MAX_LENGTH, batch_size=5):
             # Don't parse things if we don't need to
             pair = [words1, words2, None, None]
         else:
+            def get_split_position(s):
+                for pos in range(len(s) - 1, -1, -1):
+                    if s[pos][0].item() in aux_id_set:
+                        return pos + 1
+                return 0
             # Using a tree-based model, so we need parses
             # Note that this code is not compatible with using
             # tree-based models in the multi-task setting, nor with 
@@ -168,6 +175,10 @@ def file_to_batches(filename, MAX_LENGTH, batch_size=5):
                     pair = [words1, words2, parse_random(s1), parse_random(s2)]
                 elif args.parse_strategy == 'balanced':
                     pair = [words1, words2, parse_balanced(s1), parse_balanced(s2)]
+                elif args.parse_strategy == 'balanced_aux':
+                    s1_split_position = get_split_position(s1)
+                    s2_split_position = get_split_position(words2) if s1.split()[-1] == 'decl' else 1
+                    pair = [words1, words2, parse_balanced_aux(s1, s1_split_position), parse_balanced_aux(s2, s2_split_position)]
             else:
                 if args.parse_strategy == "correct":
                     pair = [words1, words2, parse_question(s1), parse_question(s2)]
@@ -177,6 +188,10 @@ def file_to_batches(filename, MAX_LENGTH, batch_size=5):
                     pair = [words1, words2, parse_random(s1), parse_random(s2)]
                 elif args.parse_strategy == 'balanced':
                     pair = [words1, words2, parse_balanced(s1), parse_balanced(s2)]
+                elif args.parse_strategy == 'balanced_aux':
+                    s1_split_position = get_split_position(words1)
+                    s2_split_position = get_split_position(words2) if s1.split()[-1] == 'decl' else 1
+                    pair = [words1, words2, parse_balanced_aux(s1, s1_split_position), parse_balanced_aux(s2, s2_split_position)]
 
         pairs.append(pair)
 
@@ -264,6 +279,3 @@ if __name__ == "__main__":
 
         # Train the model
         trainIters(encoder, decoder, 10000000, args.encoder, args.decoder, args.attention, train_batches, dev_batches, index2word, directory, prefix, print_every=1000, learning_rate=args.lr, patience=args.patience)
-
-
-

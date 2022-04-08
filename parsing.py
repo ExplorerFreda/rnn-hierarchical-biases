@@ -388,3 +388,33 @@ def parse_balanced(sent):
         length = (length + 1) // 2
     return full_parse
 
+
+def parse_balanced_aux(sent, position):
+    if position == 0 or position == len(sent):
+        return parse_balanced(sent)
+    else:
+        length = len(sent.split())
+        full_parse = []
+        while length > 0:
+            if length == 1:
+                full_parse.append([[0]])
+                break
+            elif length == 2:
+                full_parse.append([[0, 1]])
+                length = 1
+            else:
+                current_parse = []
+                for i in range(0, position, 2):
+                    if i < position - 1:
+                        current_parse.append([i, i+1])
+                    else:
+                        current_parse.append([i])
+                for i in range(position, length, 2):
+                    if i < length - 1:
+                        current_parse.append([i, i+1])
+                    else:
+                        current_parse.append([i])
+                position = (position + 1) //2 
+                length = len(current_parse)
+                full_parse.append(current_parse)
+    return full_parse
